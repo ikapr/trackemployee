@@ -3,7 +3,7 @@
 ## Description
 Developed a command-line application to manage a company's employee database. We used Node.js, Inquierer, and MySQL to developed the back end of the application. To begin the application, use must run: 
 ```
-node index.js
+node server.js
 ```
 ## Installation
 ***Requirments***
@@ -14,7 +14,7 @@ node index.js
 1. Clone the Repository on to your machine.
 2. Open the terminal and ensure you are in the right file path.
 3. Run the command ```npm install``` to download the packages.
-4. Then run the command ```node index.js``` to run the software.
+4. Then run the command ```node server.js``` to run the software.
 5. The command prompt will begin on your terminal
 
 ## User Story
