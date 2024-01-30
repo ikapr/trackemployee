@@ -8,7 +8,7 @@ require('dotenv').config();
 
 
 // Start server after DB connection
-db.connect(err => {
+db.getConnection(err => {
     if (err) throw err;
     console.log('Database connected.');
     employee_tracker();
@@ -20,25 +20,25 @@ var employee_tracker = function () {
         type: 'list',
         name: 'prompt',
         message: 'What would you like to do?',
-        choices: ['View All Department', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role', 'Log Out']
+        choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role', 'Log Out']
     }]).then((answers) => {
         // Views the Department Table in the Database
-        if (answers.prompt === 'View All Department') {
-            db.query(`SELECT * FROM department`, (err, result) => {
+        if (answers.prompt === 'View All Departments') {
+            db.query(`SELECT * FROM departments`, (err, result) => {
                 if (err) throw err;
                 console.log("Viewing All Departments: ");
                 console.table(result);
                 employee_tracker();
             });
         } else if (answers.prompt === 'View All Roles') {
-            db.query(`SELECT * FROM role`, (err, result) => {
+            db.query(`SELECT * FROM roles`, (err, result) => {
                 if (err) throw err;
                 console.log("Viewing All Roles: ");
                 console.table(result);
                 employee_tracker();
             });
         } else if (answers.prompt === 'View All Employees') {
-            db.query(`SELECT * FROM employee`, (err, result) => {
+            db.query(`SELECT * FROM employees`, (err, result) => {
                 if (err) throw err;
                 console.log("Viewing All Employees: ");
                 console.table(result);
@@ -49,7 +49,7 @@ var employee_tracker = function () {
                 // Adding a Department
                 type: 'input',
                 name: 'department',
-                message: 'What is the name of the dpeartment?',
+                message: 'What is the name of the department?',
                 validate: departmentInput => {
                     if (departmentInput) {
                         return true;
@@ -59,7 +59,7 @@ var employee_tracker = function () {
                     }
                 }
             }]).then((answers) => {
-                db.query(`INSERT INTO department (name) VALUES (?)`, [answers.department], (err, result) => {
+                db.query(`INSERT INTO departments (name) VALUES (?)`, [answers.department], (err, result) => {
                     if (err) throw err;
                     console.log(`Added ${answers.department} to the database.`)
                     employee_tracker();
@@ -67,7 +67,7 @@ var employee_tracker = function () {
             })
         } else if (answers.prompt === 'Add A Role') {
             // Beginning with the database so that we may acquire the departments for the choice
-            db.query(`SELECT * FROM department`, (err, result) => {
+            db.query(`SELECT * FROM departments`, (err, result) => {
                 if (err) throw err;
 
                 inquirer.prompt([
@@ -120,7 +120,7 @@ var employee_tracker = function () {
                         }
                     }
 
-                    db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [answers.role, answers.salary, department.id], (err, result) => {
+                    db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)`, [answers.role, answers.salary, department.id], (err, result) => {
                         if (err) throw err;
                         console.log(`Added ${answers.role} to the database.`)
                         employee_tracker();
@@ -129,7 +129,7 @@ var employee_tracker = function () {
             });
         } else if (answers.prompt === 'Add An Employee') {
             // Calling the database to acquire the roles and managers
-            db.query(`SELECT * FROM employee, role`, (err, result) => {
+            db.query(`SELECT * FROM employees, roles`, (err, result) => {
                 if (err) throw err;
 
                 inquirer.prompt([
@@ -156,7 +156,7 @@ var employee_tracker = function () {
                             if (lastNameInput) {
                                 return true;
                             } else {
-                                console.log('Please Add A Salary!');
+                                console.log('Please Add A Last Name!');
                                 return false;
                             }
                         }
@@ -179,7 +179,7 @@ var employee_tracker = function () {
                         // Adding Employee Manager
                         type: 'input',
                         name: 'manager',
-                        message: 'Who is the employees manager?',
+                        message: 'Please enter the ID of the employee who will manage this new employee',
                         validate: managerInput => {
                             if (managerInput) {
                                 return true;
@@ -197,7 +197,7 @@ var employee_tracker = function () {
                         }
                     }
 
-                    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answers.firstName, answers.lastName, role.id, answers.manager.id], (err, result) => {
+                    db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answers.firstName, answers.lastName, role.id, answers.manager], (err, result) => {
                         if (err) throw err;
                         console.log(`Added ${answers.firstName} ${answers.lastName} to the database.`)
                         employee_tracker();
@@ -206,7 +206,7 @@ var employee_tracker = function () {
             });
         } else if (answers.prompt === 'Update An Employee Role') {
             // Calling the database to acquire the roles and managers
-            db.query(`SELECT * FROM employee, role`, (err, result) => {
+            db.query(`SELECT * FROM employees, roles`, (err, result) => {
                 if (err) throw err;
 
                 inquirer.prompt([
@@ -252,7 +252,7 @@ var employee_tracker = function () {
                         }
                     }
 
-                    db.query(`UPDATE employee SET ? WHERE ?`, [{role_id: role}, {last_name: name}], (err, result) => {
+                    db.query(`UPDATE employees SET ? WHERE ?`, [{role_id: role}, {last_name: name}], (err, result) => {
                         if (err) throw err;
                         console.log(`Updated ${answers.employee} role to the database.`)
                         employee_tracker();
