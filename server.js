@@ -4,10 +4,9 @@ const db = require('./db/connection');
 require('dotenv').config();
 
 
-// Rest of your code
 
 
-// Start server after DB connection
+// Start server 
 db.getConnection(err => {
     if (err) throw err;
     console.log('Database connected.');
@@ -22,7 +21,7 @@ var employee_tracker = function () {
         message: 'What would you like to do?',
         choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role', 'Log Out']
     }]).then((answers) => {
-        // Views the Department Table in the Database
+        // Views the Department Table
         if (answers.prompt === 'View All Departments') {
             db.query(`SELECT * FROM departments`, (err, result) => {
                 if (err) throw err;
@@ -66,7 +65,7 @@ var employee_tracker = function () {
                 });
             })
         } else if (answers.prompt === 'Add A Role') {
-            // Beginning with the database so that we may acquire the departments for the choice
+            // Beginning with the database so that we get the departments 
             db.query(`SELECT * FROM departments`, (err, result) => {
                 if (err) throw err;
 
